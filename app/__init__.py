@@ -19,4 +19,6 @@ def create_app(config_class=Config):
     def index():
         return "¡Miscelia Backend funcionando al 100%! 🚀"
 
+    from app.models.usuario import Rol, Usuario
+
     return app
