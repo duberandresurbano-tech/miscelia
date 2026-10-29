@@ -1,46 +1,37 @@
 from app import db
-from datetime import datetime
 from argon2 import PasswordHasher
 
 ph = PasswordHasher()
 
+# Tabla intermedia UsuarioRol (Muchos a Muchos según tu MER)
+usuario_rol = db.Table('usuario_rol',
+    db.Column('id_usuario', db.Integer, db.ForeignKey('usuarios.id_usuario'), primary_key=True),
+    db.Column('id_rol', db.Integer, db.ForeignKey('roles.id_rol'), primary_key=True)
+)
+
 class Rol(db.Model):
     __tablename__ = 'roles'
     
-    id = db.Column(db.Integer, primary_key=True)
-    nombre = db.Column(db.String(50), unique=True, nullable=False) # Ej: Administrador, Cajero
-    descripcion = db.Column(db.String(200))
-    
-    # Relación con usuarios
-    usuarios = db.relationship('Usuario', backref='rol', lazy=True)
-
-    def __repr__(self):
-        return f'<Rol {self.nombre}>'
-
+    id_rol = db.Column(db.Integer, primary_key=True)
+    nombre = db.Column(db.String(50), unique=True, nullable=False)
+    descripcion = db.Column(db.String(200), nullable=True)
 
 class Usuario(db.Model):
     __tablename__ = 'usuarios'
     
-    id = db.Column(db.Integer, primary_key=True)
+    id_usuario = db.Column(db.Integer, primary_key=True)
     nombre = db.Column(db.String(100), nullable=False)
-    username = db.Column(db.String(50), unique=True, nullable=False)
-    password_hash = db.Column(db.String(255), nullable=False)
-    activo = db.Column(db.Boolean, default=True)
-    fecha_creacion = db.Column(db.DateTime, default=datetime.utcnow)
+    usuario_acceso = db.Column(db.String(50), unique=True, nullable=False)
+    hash_contrasena = db.Column(db.String(255), nullable=False)
+    estado = db.Column(db.Boolean, default=True)
     
-    # Llave foránea para el rol
-    rol_id = db.Column(db.Integer, db.ForeignKey('roles.id'), nullable=False)
+    roles = db.relationship('Rol', secondary=usuario_rol, backref=db.backref('usuarios', lazy='dynamic'))
 
-    def set_password(self, password):
-        """Hashea la contraseña usando Argon2 de forma segura"""
-        self.password_hash = ph.hash(password)
+    def establecer_password(self, password):
+        self.hash_contrasena = ph.hash(password)
 
-    def check_password(self, password):
-        """Verifica si la contraseña coincide con el hash almacenado"""
+    def verificar_password(self, password):
         try:
-            return ph.verify(self.password_hash, password)
+            return ph.verify(self.hash_contrasena, password)
         except Exception:
             return False
-
-    def __repr__(self):
-        return f'<Usuario {self.username}>'
