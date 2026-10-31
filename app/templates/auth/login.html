@@ -1,0 +1,66 @@
+{% extends 'layouts/base.html' %}
+
+{% block title %}Iniciar Sesión - Miscelia{% endblock %}
+
+{% block content %}
+<div class="row justify-content-center align-items-center" style="min-height: 75vh;">
+    <div class="col-md-5">
+        <div class="card shadow-sm border-0 p-4">
+            
+            <!-- Logo / Cabecera -->
+            <div class="text-center mb-4">
+                <div class="fs-1 text-primary">🏪</div>
+                <h3 class="fw-bold mt-2">MISCELIA</h3>
+                <p class="text-muted small">Sistema Local de Inventario y Ventas</p>
+            </div>
+
+            <!-- Alertas dinámicas de error o éxito -->
+            กับ {% with messages = get_flashed_messages(with_categories=true) %}
+                {% if messages %}
+                    {% for category, message in messages %}
+                        <div class="alert alert-{{ category }} alert-dismissible fade show py-2 small" role="alert">
+                            ⚠️ {{ message }}
+                            <button type="button" class="btn-close py-2" data-bs-dismiss="alert" aria-label="Close"></button>
+                        </div>
+                    {% endfor %}
+                {% endif %}
+            {% endwith %}
+
+            <!-- Formulario de Acceso -->
+            <form method="POST" action="{{ url_for('auth.login') }}">
+                <div class="mb-3">
+                    <label for="username" class="form-label fw-semibold text-secondary small">
+                        👤 Usuario o Nombre de Acceso
+                    </label>
+                    <input type="text" class="form-control" id="username" name="username" placeholder="ej. admin_tendero" required>
+                </div>
+
+                <div class="mb-3">
+                    <label for="password" class="form-label fw-semibold text-secondary small">
+                        🔒 Contraseña
+                    </label>
+                    <input type="password" class="form-control" id="password" name="password" placeholder="••••••••••••" required>
+                </div>
+
+                <div class="d-grid gap-2 mb-3">
+                    <button type="submit" class="py-2 btn btn-primary fw-bold">INICIAR SESIÓN</button>
+                </div>
+            </form>
+
+            <!-- Enlaces adicionales del diagrama -->
+            <div class="text-center mt-3">
+                <a href="#" class="text-decoration-none small text-muted">🔑 ¿Olvidaste tu contraseña?</a>
+            </div>
+
+            <hr class="my-3">
+
+            <div class="text-center">
+                <p class="small text-muted mb-0">
+                    ✨ ¿Primera vez aquí? <a href="#" class="fw-bold text-decoration-none">Registrar cuenta inicial (Admin)</a>
+                </p>
+            </div>
+
+        </div>
+    </div>
+</div>
+{% endblock %}
